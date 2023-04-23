@@ -75,7 +75,8 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static char *cpuname[] = {
   "RISCV64_GENERIC",
-  "C910V"
+  "C910V",
+  "RISCV64GCV"
 };
 
 int detect(void){
