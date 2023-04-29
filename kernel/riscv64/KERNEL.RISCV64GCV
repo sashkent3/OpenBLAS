@@ -1,18 +1,18 @@
-SAMAXKERNEL  = ../riscv64/amax.c
-DAMAXKERNEL  = ../riscv64/amax.c
+SAMAXKERNEL  = ../riscv64/amax_v.c
+DAMAXKERNEL  = ../riscv64/amax_v.c
 CAMAXKERNEL  = ../riscv64/zamax.c
 ZAMAXKERNEL  = ../riscv64/zamax.c
 
-SAMINKERNEL  = ../riscv64/amin.c
-DAMINKERNEL  = ../riscv64/amin.c
+SAMINKERNEL  = ../riscv64/amin_v.c
+DAMINKERNEL  = ../riscv64/amin_v.c
 CAMINKERNEL  = ../riscv64/zamin.c
 ZAMINKERNEL  = ../riscv64/zamin.c
 
-SMAXKERNEL   = ../riscv64/max.c
-DMAXKERNEL   = ../riscv64/max.c
+SMAXKERNEL   = ../riscv64/max_v.c
+DMAXKERNEL   = ../riscv64/max_v.c
 
-SMINKERNEL   = ../riscv64/min.c
-DMINKERNEL   = ../riscv64/min.c
+SMINKERNEL   = ../riscv64/min_v.c
+DMINKERNEL   = ../riscv64/min_v.c
 
 ISAMAXKERNEL = ../riscv64/iamax.c
 IDAMAXKERNEL = ../riscv64/iamax.c
@@ -30,13 +30,13 @@ IDMAXKERNEL  = ../riscv64/imax.c
 ISMINKERNEL  = ../riscv64/imin.c
 IDMINKERNEL  = ../riscv64/imin.c
 
-SASUMKERNEL  = ../riscv64/asum.c
-DASUMKERNEL  = ../riscv64/asum.c
+SASUMKERNEL  = ../riscv64/asum_v.c
+DASUMKERNEL  = ../riscv64/asum_v.c
 CASUMKERNEL  = ../riscv64/zasum.c
 ZASUMKERNEL  = ../riscv64/zasum.c
 
-SSUMKERNEL  = ../arm/sum.c
-DSUMKERNEL  = ../arm/sum.c
+SSUMKERNEL  = ../riscv64/sum_v.c
+DSUMKERNEL  = ../riscv64/sum_v.c
 CSUMKERNEL  = ../arm/zsum.c
 ZSUMKERNEL  = ../arm/zsum.c
 
@@ -45,8 +45,8 @@ DAXPYKERNEL  = ../riscv64/axpy.c
 CAXPYKERNEL  = ../riscv64/zaxpy.c
 ZAXPYKERNEL  = ../riscv64/zaxpy.c
 
-SCOPYKERNEL  = ../riscv64/copy.c
-DCOPYKERNEL  = ../riscv64/copy.c
+SCOPYKERNEL  = ../riscv64/copy_v.c
+DCOPYKERNEL  = ../riscv64/copy_v.c
 CCOPYKERNEL  = ../riscv64/zcopy.c
 ZCOPYKERNEL  = ../riscv64/zcopy.c
 
