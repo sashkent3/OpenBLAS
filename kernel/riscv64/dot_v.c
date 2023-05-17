@@ -73,9 +73,9 @@ FLOAT CNAME(BLASLONG n, FLOAT *x, BLASLONG inc_x, FLOAT *y, BLASLONG inc_y)
     if (n <= 0) return 0;
     VFLOAT_RES_T_M1 res_v = VFMV_S_F(*x * *y, 1);
     --n;
-    size_t vl_start = VSETVL(n), vl;
     x += inc_x;
     y += inc_y;
+    size_t vl_start = VSETVL(n), vl;
     VFLOAT_RES_T res_chunks_v = VFMV_V_F(0, vl_start);
     VFLOAT_T x_v, y_v;
     if (inc_x == 1) {
