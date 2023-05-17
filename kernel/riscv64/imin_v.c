@@ -79,7 +79,7 @@ BLASLONG CNAME(BLASLONG n, FLOAT *x, BLASLONG inc_x) {
             x_idx_v = VADD_VX(x_idx_v, vl, vl);
             vl = VSETVL(n - offset);
             x_v = VL(x + offset, vl);
-            mask =     VMFLT(x_v, chunk_v, vl);
+            mask = VMFLT(x_v, chunk_v, vl);
             chunk_v = VMERGE_F(chunk_v, x_v, mask, vl);
             chunk_idx_v = VMERGE_UI(chunk_idx_v, x_idx_v, mask, vl);
         }
@@ -90,7 +90,7 @@ BLASLONG CNAME(BLASLONG n, FLOAT *x, BLASLONG inc_x) {
             x_idx_v = VADD_VX(x_idx_v, vl, vl);
             vl = VSETVL(n - offset);
             x_v = VLS(x + offset * inc_x, stride_x, vl);
-            mask =     VMFLT(x_v, chunk_v, vl);
+            mask = VMFLT(x_v, chunk_v, vl);
             chunk_v = VMERGE_F(chunk_v, x_v, mask, vl);
             chunk_idx_v = VMERGE_UI(chunk_idx_v, x_idx_v, mask, vl);
         }
