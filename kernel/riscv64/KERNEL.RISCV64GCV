@@ -14,21 +14,21 @@ DMAXKERNEL   = ../riscv64/max_v.c
 SMINKERNEL   = ../riscv64/min_v.c
 DMINKERNEL   = ../riscv64/min_v.c
 
-ISAMAXKERNEL = ../riscv64/iamax.c
-IDAMAXKERNEL = ../riscv64/iamax.c
+ISAMAXKERNEL = ../riscv64/iamax_v.c
+IDAMAXKERNEL = ../riscv64/iamax_v.c
 ICAMAXKERNEL = ../riscv64/izamax.c
 IZAMAXKERNEL = ../riscv64/izamax.c
 
-ISAMINKERNEL = ../riscv64/iamin.c
-IDAMINKERNEL = ../riscv64/iamin.c
+ISAMINKERNEL = ../riscv64/iamin_v.c
+IDAMINKERNEL = ../riscv64/iamin_v.c
 ICAMINKERNEL = ../riscv64/izamin.c
 IZAMINKERNEL = ../riscv64/izamin.c
 
-ISMAXKERNEL  = ../riscv64/imax.c
-IDMAXKERNEL  = ../riscv64/imax.c
+ISMAXKERNEL  = ../riscv64/imax_v.c
+IDMAXKERNEL  = ../riscv64/imax_v.c
 
-ISMINKERNEL  = ../riscv64/imin.c
-IDMINKERNEL  = ../riscv64/imin.c
+ISMINKERNEL  = ../riscv64/imin_v.c
+IDMINKERNEL  = ../riscv64/imin_v.c
 
 SASUMKERNEL  = ../riscv64/asum_v.c
 DASUMKERNEL  = ../riscv64/asum_v.c
@@ -40,8 +40,8 @@ DSUMKERNEL  = ../riscv64/sum_v.c
 CSUMKERNEL  = ../arm/zsum.c
 ZSUMKERNEL  = ../arm/zsum.c
 
-SAXPYKERNEL  = ../riscv64/axpy.c
-DAXPYKERNEL  = ../riscv64/axpy.c
+SAXPYKERNEL  = ../riscv64/axpy_v.c
+DAXPYKERNEL  = ../riscv64/axpy_v.c
 CAXPYKERNEL  = ../riscv64/zaxpy.c
 ZAXPYKERNEL  = ../riscv64/zaxpy.c
 
@@ -54,54 +54,66 @@ SDOTKERNEL   = ../riscv64/dot_v.c
 DDOTKERNEL   = ../riscv64/dot_v.c
 CDOTKERNEL   = ../riscv64/zdot.c
 ZDOTKERNEL   = ../riscv64/zdot.c
-DSDOTKERNEL  = ../generic/dot.c
+DSDOTKERNEL  = ../riscv64/dot_v.c
 
-SNRM2KERNEL  = ../riscv64/nrm2.c
-DNRM2KERNEL  = ../riscv64/nrm2.c
+SNRM2KERNEL  = ../riscv64/nrm2_v.c
+DNRM2KERNEL  = ../riscv64/nrm2_v.c
 CNRM2KERNEL  = ../riscv64/znrm2.c
 ZNRM2KERNEL  = ../riscv64/znrm2.c
 
-SROTKERNEL   = ../riscv64/rot.c
-DROTKERNEL   = ../riscv64/rot.c
+SROTKERNEL   = ../riscv64/rot_v.c
+DROTKERNEL   = ../riscv64/rot_v.c
 CROTKERNEL   = ../riscv64/zrot.c
 ZROTKERNEL   = ../riscv64/zrot.c
 
-SSCALKERNEL  = ../riscv64/scal.c
-DSCALKERNEL  = ../riscv64/scal.c
+SSCALKERNEL  = ../riscv64/scal_v.c
+DSCALKERNEL  = ../riscv64/scal_v.c
 CSCALKERNEL  = ../riscv64/zscal.c
 ZSCALKERNEL  = ../riscv64/zscal.c
 
-SSWAPKERNEL  = ../riscv64/swap.c
-DSWAPKERNEL  = ../riscv64/swap.c
+SSWAPKERNEL  = ../riscv64/swap_v.c
+DSWAPKERNEL  = ../riscv64/swap_v.c
 CSWAPKERNEL  = ../riscv64/zswap.c
 ZSWAPKERNEL  = ../riscv64/zswap.c
 
-SGEMVNKERNEL = ../riscv64/gemv_n.c
-DGEMVNKERNEL = ../riscv64/gemv_n.c
+SGEMVNKERNEL = ../riscv64/gemv_n_v.c
+DGEMVNKERNEL = ../riscv64/gemv_n_v.c
 CGEMVNKERNEL = ../riscv64/zgemv_n.c
 ZGEMVNKERNEL = ../riscv64/zgemv_n.c
 
-SGEMVTKERNEL = ../riscv64/gemv_t.c
-DGEMVTKERNEL = ../riscv64/gemv_t.c
+SGEMVTKERNEL = ../riscv64/gemv_t_v.c
+DGEMVTKERNEL = ../riscv64/gemv_t_v.c
 CGEMVTKERNEL = ../riscv64/zgemv_t.c
 ZGEMVTKERNEL = ../riscv64/zgemv_t.c
 
-STRMMKERNEL	= ../generic/trmmkernel_2x2.c
-DTRMMKERNEL	= ../generic/trmmkernel_2x2.c
+STRMMKERNEL	= ../generic/trmmkernel_$(SGEMM_UNROLL_M)x$(SGEMM_UNROLL_N).c
+DTRMMKERNEL	= ../generic/trmmkernel_$(DGEMM_UNROLL_M)x$(DGEMM_UNROLL_N).c
 CTRMMKERNEL	= ../generic/ztrmmkernel_2x2.c
 ZTRMMKERNEL	= ../generic/ztrmmkernel_2x2.c
 
-SGEMMKERNEL    =  ../generic/gemmkernel_2x2.c
-SGEMMONCOPY    =  ../generic/gemm_ncopy_2.c
-SGEMMOTCOPY    =  ../generic/gemm_tcopy_2.c
-SGEMMONCOPYOBJ =  sgemm_oncopy.o
-SGEMMOTCOPYOBJ =  sgemm_otcopy.o
+SGEMMKERNEL    =  sgemm_kernel_$(SGEMM_UNROLL_M)x$(SGEMM_UNROLL_N)_v.c
+SGEMMONCOPY    =  ../generic/gemm_ncopy_$(SGEMM_UNROLL_N).c
+SGEMMOTCOPY    =  ../generic/gemm_tcopy_$(SGEMM_UNROLL_N).c
+SGEMMONCOPYOBJ =  sgemm_oncopy$(TSUFFIX).$(SUFFIX)
+SGEMMOTCOPYOBJ =  sgemm_otcopy$(TSUFFIX).$(SUFFIX)
+ifneq ($(SGEMM_UNROLL_M), $(SGEMM_UNROLL_N))
+SGEMMINCOPY    =  ../generic/gemm_ncopy_$(SGEMM_UNROLL_M).c
+SGEMMITCOPY    =  ../generic/gemm_tcopy_$(SGEMM_UNROLL_M).c
+SGEMMINCOPYOBJ =  sgemm_incopy$(TSUFFIX).$(SUFFIX)
+SGEMMITCOPYOBJ =  sgemm_itcopy$(TSUFFIX).$(SUFFIX)
+endif
 
-DGEMMKERNEL    =  ../generic/gemmkernel_2x2.c
-DGEMMONCOPY    = ../generic/gemm_ncopy_2.c
-DGEMMOTCOPY    = ../generic/gemm_tcopy_2.c
-DGEMMONCOPYOBJ = dgemm_oncopy.o
-DGEMMOTCOPYOBJ = dgemm_otcopy.o
+DGEMMKERNEL    =  dgemm_kernel_$(DGEMM_UNROLL_M)x$(DGEMM_UNROLL_N)_v.c
+DGEMMONCOPY    =  ../generic/gemm_ncopy_$(DGEMM_UNROLL_N).c
+DGEMMOTCOPY    =  ../generic/gemm_tcopy_$(DGEMM_UNROLL_N).c
+DGEMMONCOPYOBJ =  dgemm_oncopy$(TSUFFIX).$(SUFFIX)
+DGEMMOTCOPYOBJ =  dgemm_otcopy$(TSUFFIX).$(SUFFIX)
+ifneq ($(DGEMM_UNROLL_M), $(DGEMM_UNROLL_N))
+DGEMMINCOPY    =  ../generic/gemm_ncopy_$(DGEMM_UNROLL_M).c
+DGEMMITCOPY    =  ../generic/gemm_tcopy_$(DGEMM_UNROLL_M).c
+DGEMMINCOPYOBJ =  dgemm_incopy$(TSUFFIX).$(SUFFIX)
+DGEMMITCOPYOBJ =  dgemm_itcopy$(TSUFFIX).$(SUFFIX)
+endif
 
 CGEMMKERNEL    = ../generic/zgemmkernel_2x2.c
 CGEMMONCOPY    = ../generic/zgemm_ncopy_2.c

@@ -50,16 +50,15 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 FLOAT CNAME(BLASLONG n, FLOAT *x, BLASLONG inc_x) {
-	if (n <= 0 || inc_x <= 0) return 0.0;
+    if (n <= 0 || inc_x <= 0) return 0.0;
 
-	--n;
-	size_t vl_start = VSETVL(n);
-    VFLOAT_T_M1 res_v = VFMV_S_F(*x, vl_start);
+    VFLOAT_T_M1 res_v = VFMV_S_F(*x, 1);
+    --n;
+    size_t vl_start = VSETVL(n), vl;
     x += inc_x;
     VFLOAT_T chunk_v, x_v;
     if (inc_x == 1) {
         chunk_v = VL(x, vl_start);
-        size_t vl;
         for (size_t offset = vl_start; offset < n; offset += vl) {
             vl = VSETVL(n - offset);
             x_v = VL(x + offset, vl);
@@ -68,7 +67,6 @@ FLOAT CNAME(BLASLONG n, FLOAT *x, BLASLONG inc_x) {
     } else {
         ptrdiff_t stride_x = inc_x * sizeof(FLOAT);
         chunk_v = VLS(x, stride_x, vl_start);
-        size_t vl;
         for (size_t offset = vl_start; offset < n; offset += vl) {
             vl = VSETVL(n - offset);
             x_v = VLS(x + offset * inc_x, stride_x, vl);

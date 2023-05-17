@@ -29,58 +29,47 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef DOUBLE
 #define VFLOAT_T vfloat64m8_t
-#define VFLOAT_T_M1 vfloat64m1_t
+#define VSETVL __riscv_vsetvl_e64m8
 #define VL __riscv_vle64_v_f64m8
 #define VLS __riscv_vlse64_v_f64m8
-#define VSETVL __riscv_vsetvl_e64m8
-#define VFABS __riscv_vfabs_v_f64m8
-#define VFMIN __riscv_vfmin_vv_f64m8
-#define VFMV_S_F __riscv_vfmv_s_f_f64m1
-#define VFREDMIN __riscv_vfredmin_vs_f64m8_f64m1
-#define VFMV_F_S __riscv_vfmv_f_s_f64m1_f64
-#define FABS fabs
+#define VFMACC_VF __riscv_vfmacc_vf_f64m8
+#define VS __riscv_vse64_v_f64m8
+#define VSS __riscv_vsse64_v_f64m8
 #else
 #define VFLOAT_T vfloat32m8_t
-#define VFLOAT_T_M1 vfloat32m1_t
+#define VSETVL __riscv_vsetvl_e32m8
 #define VL __riscv_vle32_v_f32m8
 #define VLS __riscv_vlse32_v_f32m8
-#define VSETVL __riscv_vsetvl_e32m8
-#define VFABS __riscv_vfabs_v_f32m8
-#define VFMIN __riscv_vfmin_vv_f32m8
-#define VFMV_S_F __riscv_vfmv_s_f_f32m1
-#define VFREDMIN __riscv_vfredmin_vs_f32m8_f32m1
-#define VFMV_F_S __riscv_vfmv_f_s_f32m1_f32
-#define FABS fabsf
+#define VFMACC_VF __riscv_vfmacc_vf_f32m8
+#define VS __riscv_vse32_v_f32m8
+#define VSS __riscv_vsse32_v_f32m8
 #endif
 
-FLOAT CNAME(BLASLONG n, FLOAT *x, BLASLONG inc_x) {
-    if (n <= 0 || inc_x <= 0) return 0.0;
-
-    VFLOAT_T_M1 res_v = VFMV_S_F(FABS(*x), 1);
-    --n;
-    size_t vl_start = VSETVL(n), vl;
-    x += inc_x;
-    VFLOAT_T chunk_v, x_v;
-    if (inc_x == 1) {
-        chunk_v = VL(x, vl_start);
-        chunk_v = VFABS(chunk_v, vl_start);
-        for (size_t offset = vl_start; offset < n; offset += vl) {
-            vl = VSETVL(n - offset);
-            x_v = VL(x + offset, vl);
-            x_v = VFABS(x_v, vl);
-            chunk_v = VFMIN(chunk_v, x_v, vl);
+int CNAME(BLASLONG m, BLASLONG n, BLASLONG dummy1, FLOAT alpha, FLOAT *a, BLASLONG lda, FLOAT *x, BLASLONG inc_x, FLOAT *y, BLASLONG inc_y, FLOAT *buffer) {
+    size_t vl;
+    VFLOAT_T col_v, y_v;
+    ptrdiff_t stride_A = lda * sizeof(FLOAT);
+    if (inc_y == 1) {
+        for (size_t row_offset = 0; row_offset < n; row_offset += vl) {
+            vl = VSETVL(n - row_offset);
+            y_v = VL(y + row_offset, vl);
+            for (size_t col_offset = 0; col_offset < m; ++col_offset) {
+                col_v = VLS(a + row_offset * lda + col_offset, stride_A, vl);
+                y_v = VFMACC_VF(y_v, alpha * x[col_offset * inc_x], col_v, vl);
+            }
+            VS(y + row_offset, y_v, vl);
         }
     } else {
-        ptrdiff_t stride_x = inc_x * sizeof(FLOAT);
-        chunk_v = VLS(x, stride_x, vl_start);
-        chunk_v = VFABS(chunk_v, vl_start);
-        for (size_t offset = vl_start; offset < n; offset += vl) {
-            vl = VSETVL(n - offset);
-            x_v = VLS(x + offset * inc_x, stride_x, vl);
-            x_v = VFABS(x_v, vl);
-            chunk_v = VFMIN(chunk_v, x_v, vl);
+        ptrdiff_t stride_y = inc_y * sizeof(FLOAT);
+        for (size_t row_offset = 0; row_offset < n; row_offset += vl) {
+            vl = VSETVL(n - row_offset);
+            y_v = VLS(y + row_offset * inc_y, stride_y, vl);
+            for (size_t col_offset = 0; col_offset < m; ++col_offset) {
+                col_v = VLS(a + row_offset * lda + col_offset, stride_A, vl);
+                y_v = VFMACC_VF(y_v, alpha * x[col_offset * inc_x], col_v, vl);
+            }
+            VSS(y + row_offset * inc_y, stride_y, y_v, vl);
         }
-    } 
-    res_v = VFREDMIN(chunk_v, res_v, vl_start);
-    return VFMV_F_S(res_v);
+    }
+    return 0;
 }

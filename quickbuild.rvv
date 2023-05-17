@@ -1,0 +1,3 @@
+#!/bin/bash
+
+make HOSTCC=gcc TARGET=RISCV64GCV CFLAGS="--target=riscv64-unknown-linux-gnu --gcc-toolchain=/home/sasha/.local/riscv --sysroot=/home/sasha/.local/riscv/sysroot" CC=clang-16 FC=riscv64-unknown-linux-gnu-gfortran CROSS=1 CROSS_SUFFIX=riscv64-unknown-linux-gnu- NO_SHARED=1 USE_OPENMP=0 USE_THREAD=0
