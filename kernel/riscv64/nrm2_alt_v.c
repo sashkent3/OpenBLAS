@@ -88,15 +88,16 @@ FLOAT CNAME(BLASLONG n, FLOAT *x, BLASLONG inc_x) {
     FLOAT scale_first = FABS(*x);
     if (n == 1) return scale_first;
     if (inc_x == 0) return SQRT((FLOAT) n) * scale_first;
-    size_t vl_start = VSETVL(n - 1), vl;
+    x += inc_x; --n;
+    size_t vl_start = VSETVL(n), vl;
     VFLOAT_T ssq_v = VFMV_V_F(1.0, vl_start), scale_v, scale_coef_v, x_v;
     VBOOL_T mask, mask_rescale, mask_nonzero;
     if (inc_x == 1) {
-        scale_v = VL(x + 1, vl_start);
+        scale_v = VL(x, vl_start);
         scale_v = VFABS(scale_v, vl_start);
-        for (BLASLONG offset = vl_start + 1; offset < n; offset += vl) {
-            vl = VSETVL(n - offset);
-            x_v = VL(x + offset, vl);
+        for (; vl_start < n; n -= vl, x += vl) {
+            vl = VSETVL(n);
+            x_v = VL(x, vl);
             x_v = VFABS(x_v, vl);
             mask_rescale = VMFGT_V(x_v, scale_v, vl);
             mask_nonzero = VMFGT_F(scale_v, 0.0, vl);
@@ -116,11 +117,11 @@ FLOAT CNAME(BLASLONG n, FLOAT *x, BLASLONG inc_x) {
         }
     } else {
         ptrdiff_t stride_x = inc_x * sizeof(FLOAT);
-        scale_v = VLS(x + inc_x, stride_x, vl_start);
+        scale_v = VLS(x, stride_x, vl_start);
         scale_v = VFABS(scale_v, vl_start);
-        for (BLASLONG offset = vl_start + 1; offset < n; offset += vl) {
-            vl = VSETVL(n - offset);
-            x_v = VLS(x + offset * inc_x, stride_x, vl);
+        for (; vl_start < n; n -= vl, x += vl * inc_x) {
+            vl = VSETVL(n);
+            x_v = VLS(x, stride_x, vl);
             x_v = VFABS(x_v, vl);
             mask_rescale = VMFGT_V(x_v, scale_v, vl);
             mask_nonzero = VMFGT_F(scale_v, 0.0, vl);

@@ -49,19 +49,19 @@ int CNAME(BLASLONG n, BLASLONG dummy0, BLASLONG dummy1, FLOAT da, FLOAT *x, BLAS
     size_t vl;
     VFLOAT_T x_v;
     if (inc_x == 1) {
-        for (size_t offset = 0; offset < n; offset += vl) {
-            vl = VSETVL(n - offset);
-            x_v = VL(x + offset, vl);
+        for (; 0 < n; n -= vl, x += vl) {
+            vl = VSETVL(n);
+            x_v = VL(x, vl);
             x_v = VFMUL(x_v, da, vl);
-            VS(x + offset, x_v, vl);
+            VS(x, x_v, vl);
         }
     } else {
         ptrdiff_t stride_x = inc_x * sizeof(FLOAT);
-        for (size_t offset = 0; offset < n; offset += vl) {
-            vl = VSETVL(n - offset);
-            x_v = VLS(x + offset * inc_x, stride_x, vl);
+        for (; 0 < n; n -= vl, x += vl * inc_x) {
+            vl = VSETVL(n);
+            x_v = VLS(x, stride_x, vl);
             x_v = VFMUL(x_v, da, vl);
-            VSS(x + offset * inc_x, stride_x, x_v, vl);
+            VSS(x, stride_x, x_v, vl);
         }
     }
 }

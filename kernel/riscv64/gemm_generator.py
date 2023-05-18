@@ -1,4 +1,4 @@
-SGEMM_UNROLL_M = 4 # for better performance should be VLMAX
+SGEMM_UNROLL_M = 4 # should be no greater than VLMAX
 SGEMM_UNROLL_N = 8
 SEW = 64
 LMUL = 1

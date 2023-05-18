@@ -49,33 +49,33 @@ int CNAME(BLASLONG n, FLOAT *x, BLASLONG inc_x, FLOAT *y, BLASLONG inc_y) {
     VFLOAT_T x_v;
     if (inc_x == 1) {
         if (inc_y == 1) {
-            for (size_t offset = 0; offset < n; offset += vl) {
-                vl = VSETVL(n - offset);
-                x_v = VL(x + offset, vl);
-                VS(y + offset, x_v, vl);
+            for (; 0 < n; n -= vl, x += vl, y += vl) {
+                vl = VSETVL(n);
+                x_v = VL(x, vl);
+                VS(y, x_v, vl);
             }
         } else {
             ptrdiff_t stride_y = inc_y * sizeof(FLOAT);
-            for (size_t offset = 0; offset < n; offset += vl) {
-                vl = VSETVL(n - offset);
-                x_v = VL(x + offset, vl);
-                VSS(y + offset * inc_y, stride_y, x_v, vl);
+            for (; 0 < n; n -= vl, x += vl, y += vl * inc_y) {
+                vl = VSETVL(n);
+                x_v = VL(x, vl);
+                VSS(y, stride_y, x_v, vl);
             }
         }
     } else {
         ptrdiff_t stride_x = inc_x * sizeof(FLOAT);
         if (inc_y == 1) {
-            for (size_t offset = 0; offset < n; offset += vl) {
-                vl = VSETVL(n - offset);
-                x_v = VLS(x + offset * inc_x, stride_x, vl);
-                VS(y + offset, x_v, vl);
+            for (; 0 < n; n -= vl, x += vl * inc_x, y += vl) {
+                vl = VSETVL(n);
+                x_v = VLS(x, stride_x, vl);
+                VS(y, x_v, vl);
             }
         } else {
             ptrdiff_t stride_y = inc_y * sizeof(FLOAT);
-            for (size_t offset = 0; offset < n; offset += vl) {
-                vl = VSETVL(n - offset);
-                x_v = VLS(x + offset * inc_x, stride_x, vl);
-                VSS(y + offset * inc_y, stride_y, x_v, vl);
+            for (; 0 < n; n -= vl, x += vl * inc_x, y += vl * inc_y) {
+                vl = VSETVL(n);
+                x_v = VLS(x, stride_x, vl);
+                VSS(y, stride_y, x_v, vl);
             }
         }
     }

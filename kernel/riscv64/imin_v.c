@@ -66,19 +66,18 @@ BLASLONG CNAME(BLASLONG n, FLOAT *x, BLASLONG inc_x) {
     if (n <= 0 || inc_x <= 0) return 0.0;
 
     VFLOAT_T_M1 res_v = VFMV_S_F(*x, 1);
-    --n;
+    x += inc_x; --n;
     size_t vl_start = VSETVL(n);
-    x += inc_x;
     VFLOAT_T chunk_v, x_v;
     VUINT_T chunk_idx_v = VID(vl_start), x_idx_v = VID(vl_start);
     VBOOL_T mask;
     size_t vl = vl_start;
     if (inc_x == 1) {
         chunk_v = VL(x, vl_start);
-        for (size_t offset = vl_start; offset < n; offset += vl) {
+        for (; vl_start < n; n -= vl, x += vl) {
             x_idx_v = VADD_VX(x_idx_v, vl, vl);
-            vl = VSETVL(n - offset);
-            x_v = VL(x + offset, vl);
+            vl = VSETVL(n);
+            x_v = VL(x, vl);
             mask = VMFLT(x_v, chunk_v, vl);
             chunk_v = VMERGE_F(chunk_v, x_v, mask, vl);
             chunk_idx_v = VMERGE_UI(chunk_idx_v, x_idx_v, mask, vl);
@@ -86,10 +85,10 @@ BLASLONG CNAME(BLASLONG n, FLOAT *x, BLASLONG inc_x) {
     } else {
         ptrdiff_t stride_x = inc_x * sizeof(FLOAT);
         chunk_v = VLS(x, stride_x, vl_start);
-        for (size_t offset = vl_start; offset < n; offset += vl) {
+        for (; vl_start < n; n -= vl, x += vl * inc_x) {
             x_idx_v = VADD_VX(x_idx_v, vl, vl);
-            vl = VSETVL(n - offset);
-            x_v = VLS(x + offset * inc_x, stride_x, vl);
+            vl = VSETVL(n);
+            x_v = VLS(x, stride_x, vl);
             mask = VMFLT(x_v, chunk_v, vl);
             chunk_v = VMERGE_F(chunk_v, x_v, mask, vl);
             chunk_idx_v = VMERGE_UI(chunk_idx_v, x_idx_v, mask, vl);

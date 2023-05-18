@@ -54,41 +54,41 @@ int CNAME(BLASLONG n, BLASLONG dummy0, BLASLONG dummy1, FLOAT da, FLOAT *x, BLAS
     VFLOAT_T x_v, y_v;
     if (inc_x == 1) {
         if (inc_y == 1) {
-            for (size_t offset = 0; offset < n; offset += vl) {
-                vl = VSETVL(n - offset);
-                x_v = VL(x + offset, vl);
-                y_v = VL(y + offset, vl);
+            for (; 0 < n; n -= vl, x += vl, y += vl) {
+                vl = VSETVL(n);
+                x_v = VL(x, vl);
+                y_v = VL(y, vl);
                 y_v = VFMACC(y_v, da, x_v, vl);
-                VS(y + offset, y_v, vl);
+                VS(y, y_v, vl);
             }
         } else {
             ptrdiff_t stride_y = inc_y * sizeof(FLOAT);
-            for (size_t offset = 0; offset < n; offset += vl) {
-                vl = VSETVL(n - offset);
-                x_v = VL(x + offset, vl);
-                y_v = VLS(y + offset * inc_y, stride_y, vl);
+            for (; 0 < n; n -= vl, x += vl, y += vl * inc_y) {
+                vl = VSETVL(n);
+                x_v = VL(x, vl);
+                y_v = VLS(y, stride_y, vl);
                 y_v = VFMACC(y_v, da, x_v, vl);
-                VSS(y + offset * inc_y, stride_y, y_v, vl);
+                VSS(y, stride_y, y_v, vl);
             }
         }
     } else {
         ptrdiff_t stride_x = inc_x * sizeof(FLOAT);
         if (inc_y == 1) {
-            for (size_t offset = 0; offset < n; offset += vl) {
-                vl = VSETVL(n - offset);
-                x_v = VLS(x + offset * inc_x, stride_x, vl);
-                y_v = VL(y + offset, vl);
+            for (; 0 < n; n -= vl, x += vl * inc_x, y += vl) {
+                vl = VSETVL(n);
+                x_v = VLS(x, stride_x, vl);
+                y_v = VL(y, vl);
                 y_v = VFMACC(y_v, da, x_v, vl);
-                VS(y + offset, y_v, vl);
+                VS(y, y_v, vl);
             }
         } else {
             ptrdiff_t stride_y = inc_y * sizeof(FLOAT);
-            for (size_t offset = 0; offset < n; offset += vl) {
-                vl = VSETVL(n - offset);
-                x_v = VLS(x + offset * inc_x, stride_x, vl);
-                y_v = VLS(y + offset * inc_y, stride_y, vl);
+            for (; 0 < n; n -= vl, x += vl * inc_x, y += vl * inc_y) {
+                vl = VSETVL(n);
+                x_v = VLS(x, stride_x, vl);
+                y_v = VLS(y, stride_y, vl);
                 y_v = VFMACC(y_v, da, x_v, vl);
-                VSS(y + offset * inc_y, stride_y, y_v, vl);
+                VSS(y, stride_y, y_v, vl);
             }
         }
     }

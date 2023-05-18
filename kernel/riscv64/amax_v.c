@@ -58,16 +58,15 @@ FLOAT CNAME(BLASLONG n, FLOAT *x, BLASLONG inc_x) {
     if (n <= 0 || inc_x <= 0) return 0.0;
 
     VFLOAT_T_M1 res_v = VFMV_S_F(FABS(*x), 1);
-    --n;
+    x += inc_x; --n;
     size_t vl_start = VSETVL(n), vl;
-    x += inc_x;
     VFLOAT_T chunk_v, x_v;
     if (inc_x == 1) {
         chunk_v = VL(x, vl_start);
         chunk_v = VFABS(chunk_v, vl_start);
-        for (size_t offset = vl_start; offset < n; offset += vl) {
-            vl = VSETVL(n - offset);
-            x_v = VL(x + offset, vl);
+        for (; vl_start < n; n -= vl, x += vl) {
+            vl = VSETVL(n);
+            x_v = VL(x, vl);
             x_v = VFABS(x_v, vl);
             chunk_v = VFMAX(chunk_v, x_v, vl);
         }
@@ -75,13 +74,13 @@ FLOAT CNAME(BLASLONG n, FLOAT *x, BLASLONG inc_x) {
         ptrdiff_t stride_x = inc_x * sizeof(FLOAT);
         chunk_v = VLS(x, stride_x, vl_start);
         chunk_v = VFABS(chunk_v, vl_start);
-        for (size_t offset = vl_start; offset < n; offset += vl) {
-            vl = VSETVL(n - offset);
-            x_v = VLS(x + offset * inc_x, stride_x, vl);
+        for (; vl_start < n; n -= vl, x += vl * inc_x) {
+            vl = VSETVL(n);
+            x_v = VLS(x, stride_x, vl);
             x_v = VFABS(x_v, vl);
             chunk_v = VFMAX(chunk_v, x_v, vl);
         }
-    } 
+    }
     res_v = VFREDMAX(chunk_v, res_v, vl_start);
     return VFMV_F_S(res_v);
 }
