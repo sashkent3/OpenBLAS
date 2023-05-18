@@ -44,7 +44,7 @@
 *
 *     .. Parameters ..
       INTEGER            NIN, NOUT
-      PARAMETER          ( NIN = 5, NOUT = 6 )
+      PARAMETER          ( NIN = 99, NOUT = 6 )
       INTEGER            NSUBS
       PARAMETER          ( NSUBS = 6 )
       REAL               ZERO, HALF, ONE
@@ -97,6 +97,7 @@
       NOUTC = NOUT
 *     Read name and unit number for summary output file and open file.
 *
+      OPEN( UNIT = NIN, FILE = 'sin3', STATUS = 'OLD', ACTION = 'READ' )
       READ( NIN, FMT = * )SNAPS
       READ( NIN, FMT = * )NTRA
       TRACE = NTRA.GE.0
