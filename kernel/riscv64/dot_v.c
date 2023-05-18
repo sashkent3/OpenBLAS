@@ -72,41 +72,42 @@ FLOAT CNAME(BLASLONG n, FLOAT *x, BLASLONG inc_x, FLOAT *y, BLASLONG inc_y)
 {
     if (n <= 0) return 0;
     VFLOAT_RES_T_M1 res_v = VFMV_S_F(*x * *y, 1);
+    x += inc_x; y += inc_y; --n;
     size_t vl_start = VSETVL(n), vl;
     VFLOAT_RES_T res_chunks_v = VFMV_V_F(0, vl_start);
     VFLOAT_T x_v, y_v;
     if (inc_x == 1) {
         if (inc_y == 1) {
-            for (BLASLONG offset = 1; offset < n; offset += vl) {
-                vl = VSETVL(n - offset);
-                x_v = VL(x + offset, vl);
-                y_v = VL(y + offset, vl);
+            for (; n > 0; n -= vl, x += vl, y += vl) {
+                vl = VSETVL(n);
+                x_v = VL(x, vl);
+                y_v = VL(y, vl);
                 res_chunks_v = VFMACC(res_chunks_v, x_v, y_v, vl);
             }
         } else {
             ptrdiff_t stride_y = inc_y * sizeof(FLOAT);
-            for (BLASLONG offset = 1; offset < n; offset += vl) {
-                vl = VSETVL(n - offset);
-                x_v = VL(x + offset, vl);
-                y_v = VLS(y + offset * inc_y, stride_y, vl);
+            for (; n > 0; n -= vl, x += vl, y += vl * inc_y) {
+                vl = VSETVL(n);
+                x_v = VL(x, vl);
+                y_v = VLS(y, stride_y, vl);
                 res_chunks_v = VFMACC(res_chunks_v, x_v, y_v, vl);
             }
         }
     } else {
         ptrdiff_t stride_x = inc_x * sizeof(FLOAT);
         if (inc_y == 1) {
-            for (BLASLONG offset = 1; offset < n; offset += vl) {
-                vl = VSETVL(n - offset);
-                x_v = VLS(x + offset * inc_x, stride_x, vl);
-                y_v = VL(y + offset, vl);
+            for (; n > 0; n -= vl, x += vl * inc_x, y += vl) {
+                vl = VSETVL(n);
+                x_v = VLS(x, stride_x, vl);
+                y_v = VL(y, vl);
                 res_chunks_v = VFMACC(res_chunks_v, x_v, y_v, vl);
             }
         } else {
             ptrdiff_t stride_y = inc_y * sizeof(FLOAT);
-            for (BLASLONG offset = 1; offset < n; offset += vl) {
-                vl = VSETVL(n - offset);
-                x_v = VLS(x + offset * inc_x, stride_x, vl);
-                y_v = VLS(y + offset * inc_y, stride_y, vl);
+            for (; n > 0; n -= vl, x += vl * inc_x, y += vl * inc_y) {
+                vl = VSETVL(n);
+                x_v = VLS(x, stride_x, vl);
+                y_v = VLS(y, stride_y, vl);
                 res_chunks_v = VFMACC(res_chunks_v, x_v, y_v, vl);
             }
         }
